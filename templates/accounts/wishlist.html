@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+
+{% block title %}My Wishlist{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Success Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <div class="row">
+        <!-- Sidebar Navigation -->
+        <div class="col-lg-3 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center p-4">
+                    <div class="avatar-lg mx-auto mb-3">
+                        <div class="avatar-title bg-primary bg-soft text-primary rounded-circle font-size-20">
+                            {{ user.username|first|upper }}
+                        </div>
+                    </div>
+                    <h5 class="mb-1">{{ user.username }}</h5>
+                    <p class="text-muted mb-3">{{ user.email }}</p>
+                    
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'profile' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-user-circle me-2"></i> My Profile
+                        </a>
+                        <a href="{% url 'wishlist' %}" class="list-group-item list-group-item-action active">
+                            <i class="fas fa-heart me-2"></i> My Wishlist
+                            <span class="badge bg-primary float-end">{{ wishlist_items|length }}</span>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="fas fa-shopping-bag me-2"></i> My Orders
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="fas fa-cog me-2"></i> Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Wishlist Content -->
+        <div class="col-lg-9">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-heart text-danger me-2"></i> My Wishlist
+                        </h4>
+                        <div class="d-flex">
+                            {% if wishlist_items %}
+                            <a href="{% url 'clear_wishlist' %}" class="btn btn-outline-danger me-2" 
+                               onclick="return confirm('Are you sure you want to clear your wishlist?')">
+                                <i class="fas fa-trash me-1"></i> Clear All
+                            </a>
+                            {% endif %}
+                            <a href="/" class="btn btn-primary">
+                                <i class="fas fa-shopping-cart me-1"></i> Continue Shopping
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body p-4">
+                    {% if wishlist_items %}
+                        <p class="text-muted mb-4">You have {{ wishlist_items|length }} item(s) in your wishlist</p>
+                        
+                        <!-- Empty Wishlist Message -->
+                        <div class="text-center py-5">
+                            <i class="fas fa-heart fa-4x text-danger mb-4"></i>
+                            <h3 class="mb-3">Your wishlist is empty</h3>
+                            <p class="text-muted mb-4">Looks like you haven't added any products to your wishlist yet.</p>
+                            <a href="/" class="btn btn-primary btn-lg">
+                                <i class="fas fa-shopping-bag me-2"></i> Start Shopping
+                            </a>
+                        </div>
+                        
+                        <!-- Note: In a real application, you would fetch actual product details -->
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Note:</strong> This is a demo wishlist. In a real application, 
+                            you would see actual product details here. To implement this, you need to:
+                            <ul class="mb-0 mt-2">
+                                <li>Create a Product model</li>
+                                <li>Create a Wishlist model or use ManyToMany relationship</li>
+                                <li>Fetch product details based on product IDs in the wishlist</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Demo Products (Replace with actual product loop) -->
+                        <div class="row">
+                            <!-- Sample Product 1 -->
+                            <div class="col-md-4 mb-4">
+                                <div class="card product-card h-100 border-0 shadow-sm">
+                                    <span class="badge bg-danger position-absolute top-0 start-0 m-2">Sale</span>
+                                    <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    <img src="https://via.placeholder.com/300x200/4A90E2/FFFFFF?text=Product+1" 
+                                         class="card-img-top" alt="Product" style="height: 200px; object-fit: cover;">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Demo Product 1</h5>
+                                        <p class="card-text text-muted small">This is a demo product description.</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h5 class="text-primary mb-0">$99.99</h5>
+                                            <span class="badge bg-info">Electronics</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-white border-top-0">
+                                        <div class="d-grid gap-2">
+                                            <a href="#" class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye me-1"></i> View Details
+                                            </a>
+                                            <button class="btn btn-success btn-sm">
+                                                <i class="fas fa-cart-plus me-1"></i> Add to Cart
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sample Product 2 -->
+                            <div class="col-md-4 mb-4">
+                                <div class="card product-card h-100 border-0 shadow-sm">
+                                    <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    <img src="https://via.placeholder.com/300x200/FF6B6B/FFFFFF?text=Product+2" 
+                                         class="card-img-top" alt="Product" style="height: 200px; object-fit: cover;">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Demo Product 2</h5>
+                                        <p class="card-text text-muted small">This is another demo product.</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h5 class="text-primary mb-0">$149.99</h5>
+                                            <span class="badge bg-info">Fashion</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-white border-top-0">
+                                        <div class="d-grid gap-2">
+                                            <a href="#" class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye me-1"></i> View Details
+                                            </a>
+                                            <button class="btn btn-success btn-sm">
+                                                <i class="fas fa-cart-plus me-1"></i> Add to Cart
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Empty Wishlist -->
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-heart fa-4x text-muted"></i>
+                            </div>
+                            <h3 class="mb-3">Your wishlist is empty</h3>
+                            <p class="text-muted mb-4">Save items you like to your wishlist. Review them anytime and easily move them to the cart.</p>
+                            <a href="/" class="btn btn-primary btn-lg">
+                                <i class="fas fa-shopping-bag me-2"></i> Start Shopping
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                {% if wishlist_items %}
+                <div class="card-footer bg-white border-top py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">Wishlist Summary</h5>
+                            <p class="text-muted mb-0">{{ wishlist_items|length }} item(s) in wishlist</p>
+                        </div>
+                        <div class="text-end">
+                            <h5>Total Value: <span class="text-primary">$0.00</span></h5>
+                            <small class="text-muted">*Demo prices shown</small>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.product-card {
+    transition: all 0.3s ease;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.avatar-lg {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.bg-gradient-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.bg-gradient-info {
+    background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%);
+}
+
+.list-group-item.active {
+    background-color: #4A90E2;
+    border-color: #4A90E2;
+}
+</style>
+{% endblock %}

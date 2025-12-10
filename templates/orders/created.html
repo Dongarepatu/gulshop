@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order Successful - Gul Shop{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center py-5">
+        <div class="mb-4">
+            <i class="fas fa-check-circle fa-5x text-success"></i>
+        </div>
+        <h1 class="mb-3 text-success">Order Placed Successfully!</h1>
+        <p class="lead mb-4">Thank you for your order. We'll deliver it soon.</p>
+        
+        <div class="card shadow-sm mx-auto mb-5" style="max-width: 600px;">
+            <div class="card-body">
+                <h4 class="card-title mb-4" style="color: #8B4513;">
+                    <i class="fas fa-receipt me-2"></i>Order Details
+                </h4>
+                
+                <div class="row text-start mb-4">
+                    <div class="col-md-6">
+                        <p><strong>Order ID:</strong><br>
+                           <span class="text-warning fs-5">{{ order.order_id }}</span></p>
+                        <p><strong>Order Date:</strong><br>
+                           {{ order.created_at|date:"F d, Y" }}</p>
+                        <p><strong>Payment Method:</strong><br>
+                           {{ order.get_payment_method_display }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Customer Name:</strong><br>
+                           {{ order.name }}</p>
+                        <p><strong>Phone:</strong><br>
+                           {{ order.phone }}</p>
+                        <p><strong>Order Status:</strong><br>
+                           <span class="badge bg-warning">{{ order.get_status_display }}</span></p>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h6><strong>Delivery Address:</strong></h6>
+                    <p class="mb-1">{{ order.address }}</p>
+                    <p class="mb-1">{{ order.city }}, {{ order.state }} - {{ order.pincode }}</p>
+                </div>
+                
+                <div class="table-responsive">
+                    <h6><strong>Order Items:</strong></h6>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Qty</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.items.all %}
+                            <tr>
+                                <td>{{ item.product.name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>₹{{ item.price }}</td>
+                                <td>₹{{ item.get_cost }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Total Amount:</strong></td>
+                                <td><strong class="fs-5" style="color: #da5c02;">₹{{ order.total_amount }}</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'products:home' %}" class="btn btn-warning btn-lg">
+                        <i class="fas fa-home me-2"></i>Continue Shopping
+                    </a>
+                    <a href="{% url 'orders:track' order.order_id %}" class="btn btn-outline-warning">
+                        <i class="fas fa-truck me-2"></i>Track Your Order
+                    </a>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'orders:history' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-history me-2"></i>View Order History
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-5">
+            <h4 class="mb-4">What happens next?</h4>
+            <div class="row justify-content-center">
+                <div class="col-md-3 mb-3">
+                    <div class="card border-0 bg-light h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-check-circle fa-2x text-warning"></i>
+                            </div>
+                            <h6>Order Confirmed</h6>
+                            <small class="text-muted">Your order is received</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card border-0 bg-light h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-box fa-2x text-warning"></i>
+                            </div>
+                            <h6>Order Packed</h6>
+                            <small class="text-muted">We prepare your items</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card border-0 bg-light h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-shipping-fast fa-2x text-warning"></i>
+                            </div>
+                            <h6>Order Shipped</h6>
+                            <small class="text-muted">On the way to you</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card border-0 bg-light h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-home fa-2x text-warning"></i>
+                            </div>
+                            <h6>Delivered</h6>
+                            <small class="text-muted">Receive your order</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="alert alert-info mt-5 mx-auto" style="max-width: 800px;">
+            <h5><i class="fas fa-headset me-2"></i>Need Help?</h5>
+            <p class="mb-2">For any queries regarding your order, please contact our customer support:</p>
+            <p class="mb-1"><i class="fas fa-phone me-2"></i> Customer Care: 1800-123-4567</p>
+            <p class="mb-0"><i class="fas fa-envelope me-2"></i> Email: support@gulshop.com</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

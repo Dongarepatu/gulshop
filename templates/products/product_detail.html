@@ -1,0 +1,405 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - Gul Shop{% endblock %}
+
+{% block content %}
+
+<div style="max-width: 1100px; margin: 0 auto; padding: 20px 10px;">
+    <!-- Messages -->
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        <i
+            class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-circle{% endif %} me-2"></i>
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+
+        <!-- Product Image -->
+        <div style="position: relative;">
+            <!-- Wishlist Button -->
+            <div style="position: absolute; top: 15px; right: 15px; z-index: 10;">
+                {% if is_in_wishlist %}
+                <button id="wishlist-btn" onclick="toggleWishlist('{{ product.id }}')"
+                    style="width: 50px; height: 50px; border-radius: 50%; background: #dc3545; border: none; color: white; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2);"
+                    title="Remove from Wishlist">
+                    <i class="fas fa-heart"></i>
+                </button>
+                {% else %}
+                <button id="wishlist-btn" onclick="toggleWishlist('{{ product.id }}')"
+                    style="width: 50px; height: 50px; border-radius: 50%; background: white; border: 2px solid #dc3545; color: #dc3545; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2);"
+                    title="Add to Wishlist">
+                    <i class="far fa-heart"></i>
+                </button>
+                {% endif %}
+            </div>
+
+            <!-- Product Image -->
+            <div
+                style="background: #f8f4f0; border-radius: 10px; padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(139, 69, 19, 0.1);">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                    style="max-width: 100%; height: 400px; object-fit: contain; border-radius: 8px;">
+                {% else %}
+                <div style="color: #8B4513; font-size: 1.2rem; padding: 50px;">
+                    {{ product.name }} Image
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Product Info -->
+        <div>
+            <h1 style="color: #8B4513; font-size: 2.2rem; margin-bottom: 10px; font-weight: 700;">{{ product.name }}
+            </h1>
+
+            <div
+                style="color: #a0522d; font-size: 1.1rem; margin-bottom: 15px; display: inline-block; padding: 5px 15px; background: #fff8f0; border-radius: 20px; border: 1px solid #ffd8b5;">
+                <i class="fas fa-tag me-1"></i>
+                {{ product.category.name|default:"Premium Organic Jaggery" }}
+            </div>
+
+            <!-- Price -->
+            <div style="font-size: 2.2rem; font-weight: bold; color: #8B4513; margin: 25px 0;">
+                ₹{{ product.price }}
+            </div>
+
+            <!-- Stock Status -->
+            {% if product.available %}
+            <div
+                style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 20px; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; margin-bottom: 20px;">
+                <i class="fas fa-check-circle"></i>
+                In Stock
+            </div>
+            {% else %}
+            <div
+                style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 20px; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; margin-bottom: 20px;">
+                <i class="fas fa-times-circle"></i>
+                Out of Stock
+            </div>
+            {% endif %}
+
+            <!-- Description -->
+            <div
+                style="margin: 25px 0; background: #fffbf7; padding: 20px; border-radius: 10px; border: 1px solid #ffedd9;">
+                <h3 style="color: #8B4513; margin-bottom: 15px; font-size: 1.3rem;">Description:</h3>
+                <div style="white-space: pre-line; line-height: 1.8; color: #333;">
+                    {{ product.description|linebreaksbr }}
+                </div>
+            </div>
+
+            <!-- Quantity Selector -->
+            <div style="margin: 25px 0;">
+                <label
+                    style="color: #8B4513; font-weight: 600; font-size: 1.1rem; margin-right: 15px;">Quantity:</label>
+                <div style="display: inline-flex; align-items: center; gap: 10px;">
+                    <button type="button" onclick="changeQuantity(-1)"
+                        style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #da5c02; background: white; color: #da5c02; font-size: 1.2rem; cursor: pointer;">
+                        -
+                    </button>
+                    <input type="number" id="quantity" value="1" min="1" max="10"
+                        style="width: 80px; height: 40px; text-align: center; border: 2px solid #da5c02; border-radius: 8px; font-size: 1.2rem; font-weight: 600;">
+                    <button type="button" onclick="changeQuantity(1)"
+                        style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #da5c02; background: white; color: #da5c02; font-size: 1.2rem; cursor: pointer;">
+                        +
+                    </button>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 30px 0;">
+                {% if product.available %}
+                <!-- Add to Cart Form -->
+                <form method="POST" action="{% url 'products:add_to_cart' product.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    <input type="hidden" name="quantity" id="form-quantity" value="1">
+
+                    <button type="submit"
+                        style="background: linear-gradient(135deg, #da5c02, #ff8c42); border: none; color: white; padding: 15px; font-size: 1.1rem; font-weight: 600; border-radius: 8px; width: 100%; cursor: pointer;">
+                        <i class="fas fa-cart-plus me-2"></i> Add to Cart
+                    </button>
+                </form>
+
+                <!-- Buy Now Button (Simple Version) -->
+                <form method="POST" action="{% url 'products:add_to_cart' product.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="quantity" id="buy-now-quantity" value="1">
+                    <input type="hidden" name="buy_now" value="true">
+                    <button type="submit"
+                        style="background: linear-gradient(135deg, #28a745, #20c997); border: none; color: white; padding: 15px; font-size: 1.1rem; font-weight: 600; border-radius: 8px; width: 100%; cursor: pointer;">
+                        <i class="fas fa-bolt me-2"></i> Buy Now
+                    </button>
+                </form>
+                {% else %}
+                <button
+                    style="background: #6c757d; border: none; color: white; padding: 15px; font-size: 1.1rem; font-weight: 600; border-radius: 8px; width: 100%; cursor: not-allowed;"
+                    disabled>
+                    <i class="fas fa-bell me-2"></i> Notify When Available
+                </button>
+                {% endif %}
+            </div>
+
+            <!-- Product Features -->
+            <div style="background: #f9f5f0; padding: 20px; border-radius: 10px; border: 1px solid #e8dccd;">
+                <h4 style="color: #8B4513; font-size: 1.3rem; font-weight: 600; margin-bottom: 15px;">
+                    <i class="fas fa-star me-2"></i>Why Choose Our Jaggery:
+                </h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px 0;">
+                        <i class="fas fa-check-circle" style="color: #da5c02;"></i>
+                        <span>100% Pure & Organic</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px 0;">
+                        <i class="fas fa-check-circle" style="color: #da5c02;"></i>
+                        <span>No Artificial Additives</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px 0;">
+                        <i class="fas fa-check-circle" style="color: #da5c02;"></i>
+                        <span>Rich in Minerals & Iron</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px 0;">
+                        <i class="fas fa-check-circle" style="color: #da5c02;"></i>
+                        <span>Traditional Processing</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Details Tabs -->
+    <div
+        style="margin-top: 40px; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <div style="display: flex; gap: 20px; border-bottom: 2px solid #e9ecef; margin-bottom: 20px;">
+            <button type="button" onclick="showTab('description')"
+                style="padding: 12px 25px; border: none; background: none; color: #da5c02; font-weight: 600; border-bottom: 3px solid #da5c02; cursor: pointer;">
+                <i class="fas fa-file-alt me-2"></i>Description
+            </button>
+            <button type="button" onclick="showTab('benefits')"
+                style="padding: 12px 25px; border: none; background: none; color: #666; font-weight: 600; cursor: pointer;">
+                <i class="fas fa-heartbeat me-2"></i>Health Benefits
+            </button>
+            <button type="button" onclick="showTab('usage')"
+                style="padding: 12px 25px; border: none; background: none; color: #666; font-weight: 600; cursor: pointer;">
+                <i class="fas fa-info-circle me-2"></i>Usage
+            </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div id="description-tab" style="display: block;">
+            <h4 style="color: #8B4513; margin-bottom: 15px;">Product Details</h4>
+            <p style="line-height: 1.8; color: #333;">
+                {{ product.description|linebreaksbr }}
+            </p>
+        </div>
+
+        <div id="benefits-tab" style="display: none;">
+            <h4 style="color: #8B4513; margin-bottom: 15px;">Health Benefits</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <h5><i class="fas fa-heart text-danger me-2"></i> Rich in Iron</h5>
+                    <p style="color: #666;">Helps prevent anemia and boosts hemoglobin levels.</p>
+                </div>
+                <div>
+                    <h5><i class="fas fa-lungs text-info me-2"></i> Detoxifies Body</h5>
+                    <p style="color: #666;">Helps cleanse liver and flush out toxins.</p>
+                </div>
+                <div>
+                    <h5><i class="fas fa-bone text-warning me-2"></i> Boosts Immunity</h5>
+                    <p style="color: #666;">Packed with antioxidants that strengthen immune system.</p>
+                </div>
+                <div>
+                    <h5><i class="fas fa-temperature-high text-danger me-2"></i> Prevents Heat Stroke</h5>
+                    <p style="color: #666;">Helps control body temperature during summer.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="usage-tab" style="display: none;">
+            <h4 style="color: #8B4513; margin-bottom: 15px;">Usage Instructions</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <h5><i class="fas fa-utensils text-primary me-2"></i> Cooking</h5>
+                    <p style="color: #666;">Use as a natural sweetener in desserts, tea, and traditional recipes.</p>
+                </div>
+                <div>
+                    <h5><i class="fas fa-box text-success me-2"></i> Storage</h5>
+                    <p style="color: #666;">Store in airtight container in cool, dry place away from sunlight.</p>
+                </div>
+                <div>
+                    <h5><i class="fas fa-calendar-alt text-info me-2"></i> Shelf Life</h5>
+                    <p style="color: #666;">12 months from date of manufacture.</p>
+                </div>
+                <div>
+                    <h5><i class="fas fa-exclamation-triangle text-warning me-2"></i> Precautions</h5>
+                    <p style="color: #666;">Consume in moderation. Not recommended for diabetics without consultation.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Simple JavaScript functions
+
+    // Quantity Control
+    function changeQuantity(amount) {
+        var quantityInput = document.getElementById('quantity');
+        var currentValue = parseInt(quantityInput.value);
+        var newValue = currentValue + amount;
+
+        if (newValue < 1) newValue = 1;
+        if (newValue > 10) newValue = 10;
+
+        quantityInput.value = newValue;
+
+        // Update both hidden form fields
+        document.getElementById('form-quantity').value = newValue;
+        document.getElementById('buy-now-quantity').value = newValue;
+    }
+
+    // Update form quantity on input change
+    document.getElementById('quantity').addEventListener('input', function () {
+        var value = parseInt(this.value);
+        if (value < 1) this.value = 1;
+        if (value > 10) this.value = 10;
+
+        var newValue = this.value;
+        document.getElementById('form-quantity').value = newValue;
+        document.getElementById('buy-now-quantity').value = newValue;
+    });
+
+    // Wishlist Toggle
+    function toggleWishlist(productId) {
+        var wishlistBtn = document.getElementById('wishlist-btn');
+        var heartIcon = wishlistBtn.querySelector('i');
+
+        // Check if already in wishlist
+        var isInWishlist = heartIcon.classList.contains('fas');
+
+        // Get CSRF token
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Send request to wishlist endpoint
+        fetch('/accounts/wishlist/' + (isInWishlist ? 'remove' : 'add') + '/' + productId + '/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(function (response) {
+                if (response.redirected) {
+                    // If redirected to login page
+                    window.location.href = '/accounts/login/?next=' + window.location.pathname;
+                    return;
+                }
+                return response.json();
+            })
+            .then(function (data) {
+                if (data && data.success) {
+                    // Toggle heart icon
+                    if (isInWishlist) {
+                        heartIcon.classList.remove('fas');
+                        heartIcon.classList.add('far');
+                        wishlistBtn.style.background = 'white';
+                        wishlistBtn.style.color = '#dc3545';
+                        wishlistBtn.title = "Add to Wishlist";
+                        showMessage('Removed from wishlist', 'info');
+                    } else {
+                        heartIcon.classList.remove('far');
+                        heartIcon.classList.add('fas');
+                        wishlistBtn.style.background = '#dc3545';
+                        wishlistBtn.style.color = 'white';
+                        wishlistBtn.title = "Remove from Wishlist";
+                        showMessage('Added to wishlist!', 'success');
+                    }
+                }
+            })
+            .catch(function (error) {
+                console.log('Error:', error);
+                showMessage('Please login to use wishlist', 'warning');
+            });
+    }
+
+    // Tab Switching
+    function showTab(tabName) {
+        // Hide all tabs
+        document.getElementById('description-tab').style.display = 'none';
+        document.getElementById('benefits-tab').style.display = 'none';
+        document.getElementById('usage-tab').style.display = 'none';
+
+        // Show selected tab
+        document.getElementById(tabName + '-tab').style.display = 'block';
+
+        // Update active tab button
+        var buttons = document.querySelectorAll('button[onclick^="showTab"]');
+        buttons.forEach(function (btn) {
+            btn.style.color = '#666';
+            btn.style.borderBottom = 'none';
+        });
+
+        // Highlight active button
+        var activeBtn = document.querySelector('button[onclick="showTab(\'' + tabName + '\')"]');
+        if (activeBtn) {
+            activeBtn.style.color = '#da5c02';
+            activeBtn.style.borderBottom = '3px solid #da5c02';
+        }
+    }
+
+    // Show Message
+    function showMessage(message, type) {
+        // Create message element
+        var messageDiv = document.createElement('div');
+        messageDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
+        messageDiv.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check' : 'info'}-circle me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+
+        // Insert at top of content
+        var container = document.querySelector('div[style*="max-width: 1100px"]');
+        if (container) {
+            container.insertBefore(messageDiv, container.firstChild);
+        } else {
+            document.body.insertBefore(messageDiv, document.body.firstChild);
+        }
+
+        // Auto remove after 5 seconds
+        setTimeout(function () {
+            if (messageDiv.parentNode) {
+                messageDiv.remove();
+            }
+        }, 5000);
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function () {
+        // Set initial values for hidden fields
+        var initialQuantity = document.getElementById('quantity').value;
+        document.getElementById('form-quantity').value = initialQuantity;
+        document.getElementById('buy-now-quantity').value = initialQuantity;
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-4 mb-4">Welcome to Gul Shop</h1>
+        <p class="lead mb-4">Discover the Natural Sweetness of Premium Jaggery Products</p>
+        <a href="{% url 'products:product_list' %}" class="btn btn-warning btn-lg">Shop Now</a>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h2>Why Choose Gul Shop?</h2>
+            <p class="lead">We offer the finest quality jaggery products</p>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-4 text-center">
+            <i class="fas fa-seedling fa-3x text-warning mb-3"></i>
+            <h4>100% Natural</h4>
+            <p>Pure, organic jaggery from trusted farms</p>
+        </div>
+        <div class="col-md-4 text-center">
+            <i class="fas fa-heart fa-3x text-warning mb-3"></i>
+            <h4>Health Benefits</h4>
+            <p>Rich in minerals and better than sugar</p>
+        </div>
+        <div class="col-md-4 text-center">
+            <i class="fas fa-shipping-fast fa-3x text-warning mb-3"></i>
+            <h4>Fast Delivery</h4>
+            <p>Quick shipping across India</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

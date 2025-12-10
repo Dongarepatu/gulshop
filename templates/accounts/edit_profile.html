@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0"><i class="fas fa-user-edit me-2"></i> Edit Profile</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Display form errors -->
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <strong>Please correct the errors below:</strong>
+                                <ul class="mb-0">
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <li>{{ field }}: {{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="row">
+                            <!-- First Name -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_first_name" class="form-label">
+                                    <i class="fas fa-user me-1"></i> First Name
+                                </label>
+                                <input type="text" 
+                                       name="first_name" 
+                                       id="id_first_name"
+                                       class="form-control form-control-lg"
+                                       value="{{ form.first_name.value|default:'' }}"
+                                       placeholder="Enter your first name">
+                            </div>
+                            
+                            <!-- Last Name -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_last_name" class="form-label">
+                                    <i class="fas fa-user me-1"></i> Last Name
+                                </label>
+                                <input type="text" 
+                                       name="last_name" 
+                                       id="id_last_name"
+                                       class="form-control form-control-lg"
+                                       value="{{ form.last_name.value|default:'' }}"
+                                       placeholder="Enter your last name">
+                            </div>
+                            
+                            <!-- Email -->
+                            <div class="col-md-12 mb-3">
+                                <label for="id_email" class="form-label">
+                                    <i class="fas fa-envelope me-1"></i> Email Address
+                                </label>
+                                <input type="email" 
+                                       name="email" 
+                                       id="id_email"
+                                       class="form-control form-control-lg"
+                                       value="{{ form.email.value|default:'' }}"
+                                       placeholder="Enter your email address"
+                                       required>
+                                <div class="invalid-feedback">
+                                    Please provide a valid email address.
+                                </div>
+                            </div>
+                            
+                            <!-- Phone Number -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_phone_number" class="form-label">
+                                    <i class="fas fa-phone me-1"></i> Phone Number
+                                </label>
+                                <input type="tel" 
+                                       name="phone_number" 
+                                       id="id_phone_number"
+                                       class="form-control form-control-lg"
+                                       value="{{ form.phone_number.value|default:'' }}"
+                                       placeholder="Enter your phone number">
+                            </div>
+                            
+                            <!-- Address -->
+                            <div class="col-md-12 mb-4">
+                                <label for="id_address" class="form-label">
+                                    <i class="fas fa-map-marker-alt me-1"></i> Address
+                                </label>
+                                <textarea name="address" 
+                                          id="id_address"
+                                          class="form-control form-control-lg"
+                                          rows="4"
+                                          placeholder="Enter your full address">{{ form.address.value|default:'' }}</textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                            <a href="{% url 'profile' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Back to Profile
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg px-4">
+                                <i class="fas fa-save me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+
+<style>
+.form-control-lg {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+.form-control-lg:focus {
+    border-color: #4A90E2;
+    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 8px;
+}
+</style>
+{% endblock %}

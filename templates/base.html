@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gul Shop - Premium Jaggery Products{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+            color: #da5c02 !important;
+        }
+
+        .hero-section {
+            background: linear-gradient(rgba(211, 90, 3, 0.8), rgba(148, 65, 5, 0.8));
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 0;
+        }
+
+        .product-card {
+            transition: transform 0.3s;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .btn-warning {
+            background-color: #713102;
+            border-color: #7d3908;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #4f2903;
+            border-color: #522a03;
+            color: white;
+        }
+
+        .dropdown-item form {
+            margin: 0;
+        }
+
+        .dropdown-item button {
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            padding: 0;
+        }
+
+        .admin-badge {
+            background-color: #dc3545;
+            font-size: 0.7em;
+            margin-left: 5px;
+        }
+
+        .admin-dropdown .dropdown-toggle {
+            color: #dc3545 !important;
+            font-weight: bold;
+        }
+
+        .cart-badge {
+            position: relative;
+            top: -1px;
+        }
+
+        .footer {
+            background: linear-gradient(rgba(33, 37, 41, 1), rgba(0, 0, 0, 0.9));
+        }
+
+        .main-content {
+            min-height: calc(100vh - 200px);
+        }
+
+        /* Active link styling */
+        .nav-link.active {
+            font-weight: 600;
+            color: #da5c02 !important;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-cube me-2"></i>Gul Shop
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+                            href="{% url 'home' %}">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'products' in request.resolver_match.app_names %}active{% endif %}"
+                            href="{% url 'products:product_list' %}">
+                            <i class="fas fa-store me-1"></i>Products
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'about' in request.resolver_match.app_names %}active{% endif %}"
+                            href="{% url 'about:about' %}">
+                            <i class="fas fa-info-circle me-1"></i>About
+                        </a>
+                    </li>
+
+                    <!-- ADMIN LINKS - Only show for staff users -->
+                    {% if user.is_staff %}
+                    <li class="nav-item dropdown admin-dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button"
+                            data-bs-toggle="dropdown">
+                            <i class="fas fa-cog me-1"></i>Admin
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/admin/">
+                                    <i class="fas fa-tachometer-alt me-2"></i>Admin Panel
+                                </a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/admin/products/product/add/">
+                                    <i class="fas fa-plus-circle me-2"></i>Add Product
+                                </a></li>
+                            <li><a class="dropdown-item" href="/admin/products/product/">
+                                    <i class="fas fa-edit me-2"></i>Manage Products
+                                </a></li>
+                            <li><a class="dropdown-item" href="/admin/orders/order/">
+                                    <i class="fas fa-shopping-bag me-2"></i>View Orders
+                                </a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/admin/accounts/customuser/">
+                                    <i class="fas fa-users me-2"></i>Manage Users
+                                </a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                </ul>
+
+                <ul class="navbar-nav ms-auto">
+                    <!-- Cart Link -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'cart_detail' %}active{% endif %}"
+                            href="{% url 'cart:cart_detail' %}">
+                            <i class="fas fa-shopping-cart me-1"></i>Cart
+                            {% with cart=request.session.cart %}
+                            {% if cart %}
+                            {% with cart_count=cart|length %}
+                            {% if cart_count > 0 %}
+                            <span class="badge bg-warning cart-badge">{{ cart_count }}</span>
+                            {% endif %}
+                            {% endwith %}
+                            {% endif %}
+                            {% endwith %}
+                        </a>
+                    </li>
+
+                    <!-- User Authentication -->
+                    {% if user.is_authenticated %}
+                    <!-- User logged in -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                            data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-1"></i>{{ user.username|truncatechars:15 }}
+                            {% if user.is_staff %}
+                            <span class="badge bg-danger admin-badge">Admin</span>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <!-- FIXED: Added proper URLs for Profile and Wishlist -->
+                            <li><a class="dropdown-item" href="{% url 'profile' %}">
+                                    <i class="fas fa-user-circle me-2"></i>My Profile
+                                </a></li>
+                            <li><a class="dropdown-item" href="{% url 'wishlist' %}">
+                                    <i class="fas fa-heart me-2"></i>My Wishlist
+                                    {% with wishlist_items=request.session.wishlist|default:'' %}
+                                    {% if wishlist_items %}
+                                    <span class="badge bg-primary float-end">{{ wishlist_items|length }}</span>
+                                    {% endif %}
+                                    {% endwith %}
+                                </a></li>
+                            <!--{% if 'orders' in request.resolver_match.app_names %}
+                            <li><a class="dropdown-item" href="{% url 'orders:history' %}"></a>
+                                <i class="fas fa-history me-2"></i>My Orders
+                            </a></li>
+                            {% endif %}-->
+                            {% if 'orders' in request.resolver_match.app_names and request.user.is_authenticated %}
+                            <li><a class="dropdown-item" href="{% url 'orders:history' %}">
+                                    <i class="fas fa-history me-2"></i>My Orders
+                                </a></li>
+                            {% endif %}
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="{% url 'edit_profile' %}">
+                                    <i class="fas fa-cog me-2"></i>Settings
+                                </a></li>
+                            <li>
+                                <form method="post" action="{% url 'logout' %}" class="dropdown-item p-0">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                        class="btn btn-link p-0 text-start w-100 text-decoration-none">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <!-- User not logged in -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'signup' %}">
+                            <i class="fas fa-user-plus me-1"></i>Register
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm">
+            <div class="d-flex align-items-center">
+                {% if message.tags == 'success' %}
+                <i class="fas fa-check-circle me-2"></i>
+                {% elif message.tags == 'error' or message.tags == 'danger' %}
+                <i class="fas fa-exclamation-circle me-2"></i>
+                {% elif message.tags == 'warning' %}
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                {% elif message.tags == 'info' %}
+                <i class="fas fa-info-circle me-2"></i>
+                {% endif %}
+                <span>{{ message }}</span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}
+        <!-- Default content -->
+        <div class="container mt-5">
+            <div class="hero-section text-center rounded shadow">
+                <h1 class="display-4 fw-bold mb-4">Welcome to Gul Shop</h1>
+                <p class="lead mb-4">Experience the Natural Goodness of Premium Jaggery</p>
+                <a href="{% url 'products:product_list' %}" class="btn btn-light btn-lg px-4">
+                    <i class="fas fa-shopping-bag me-2"></i>Shop Now
+                </a>
+            </div>
+
+            <!-- Features Section -->
+            <div class="row mt-5 text-center">
+                <div class="col-md-4 mb-4">
+                    <div class="bg-light rounded-circle p-4 d-inline-block mb-3 shadow-sm">
+                        <i class="fas fa-seedling fa-3x text-warning"></i>
+                    </div>
+                    <h4 class="mb-3">100% Natural</h4>
+                    <p class="text-muted">Pure, organic jaggery from trusted farms</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="bg-light rounded-circle p-4 d-inline-block mb-3 shadow-sm">
+                        <i class="fas fa-heart fa-3x text-warning"></i>
+                    </div>
+                    <h4 class="mb-3">Health Benefits</h4>
+                    <p class="text-muted">Rich in minerals and better than refined sugar</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="bg-light rounded-circle p-4 d-inline-block mb-3 shadow-sm">
+                        <i class="fas fa-shipping-fast fa-3x text-warning"></i>
+                    </div>
+                    <h4 class="mb-3">Fast Delivery</h4>
+                    <p class="text-muted">Quick shipping across all over India</p>
+                </div>
+            </div>
+        </div>
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer text-light py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3">
+                        <i class="fas fa-cube me-2"></i>Gul Shop
+                    </h5>
+                    <p>Premium quality jaggery products sourced directly from organic farms.</p>
+                    <div class="mt-3">
+                        <a href="#" class="text-light me-3"><i class="fab fa-facebook fa-lg"></i></a>
+                        <a href="#" class="text-light me-3"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-light"><i class="fab fa-twitter fa-lg"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'home' %}" class="text-light text-decoration-none">Home</a></li>
+                        <li><a href="{% url 'products:product_list' %}"
+                                class="text-light text-decoration-none">Products</a></li>
+                        <li><a href="{% url 'about:about' %}" class="text-light text-decoration-none">About Us</a></li>
+                        <li><a href="{% url 'cart:cart_detail' %}" class="text-light text-decoration-none">Cart</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3">Contact Us</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-phone me-2"></i>+91-9029993555
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-envelope me-2"></i>info@gulshop.com
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-map-marker-alt me-2"></i>Pune, India
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="bg-light">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2024 Gul Shop. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">Made with <i class="fas fa-heart text-danger"></i> for jaggery lovers</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function () {
+            // Auto-hide alerts
+            setTimeout(function () {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function (alert) {
+                    if (alert.classList.contains('alert-dismissible')) {
+                        const closeBtn = alert.querySelector('.btn-close');
+                        if (closeBtn) {
+                            closeBtn.click();
+                        }
+                    }
+                });
+            }, 5000);
+
+            // Add active class to current page
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+
+            // Initialize tooltips if any
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Prevent dropdown from closing on inside click
+            document.querySelectorAll('.dropdown-menu').forEach(function (dropdown) {
+                dropdown.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                });
+            });
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

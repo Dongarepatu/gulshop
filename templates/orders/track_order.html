@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Track Order #{{ order.order_id }} - Gul Shop{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 style="color: #8B4513;">
+            <i class="fas fa-truck me-2"></i>Track Your Order
+        </h1>
+        <p class="lead">Track the status of your order #{{ order.order_id }}</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Order Summary -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-3 mb-md-0">
+                            <div class="fs-1" style="color: #8B4513;">#{{ order.order_id }}</div>
+                            <small class="text-muted">Order ID</small>
+                        </div>
+                        <div class="col-md-4 text-center mb-3 mb-md-0">
+                            <div class="fs-4" style="color: #da5c02;">₹{{ order.total_amount }}</div>
+                            <small class="text-muted">Total Amount</small>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="badge bg-{{ order.get_status_display_class }} fs-6">
+                                {{ order.get_status_display }}
+                            </div>
+                            <div class="mt-1">
+                                <small class="text-muted">Current Status</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIMPLE Tracking Timeline - NO SPLIT FILTER -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0"><i class="fas fa-road me-2"></i>Order Progress</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Simple Progress Steps -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="text-center">
+                            <div class="step-circle {% if order.status != 'pending' %}active{% endif %}">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <p class="mt-2 mb-0 small">Order Placed</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="step-circle {% if order.status in 'confirmed,processing,shipped,delivered' %}active{% endif %}">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <p class="mt-2 mb-0 small">Confirmed</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="step-circle {% if order.status in 'processing,shipped,delivered' %}active{% endif %}">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <p class="mt-2 mb-0 small">Processing</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="step-circle {% if order.status in 'shipped,delivered' %}active{% endif %}">
+                                <i class="fas fa-shipping-fast"></i>
+                            </div>
+                            <p class="mt-2 mb-0 small">Shipped</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="step-circle {% if order.status == 'delivered' %}active{% endif %}">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <p class="mt-2 mb-0 small">Delivered</p>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="progress mb-3" style="height: 20px;">
+                        {% if order.status == 'pending' %}
+                            <div class="progress-bar bg-warning" style="width: 20%">20%</div>
+                        {% elif order.status == 'confirmed' %}
+                            <div class="progress-bar bg-info" style="width: 40%">40%</div>
+                        {% elif order.status == 'processing' %}
+                            <div class="progress-bar bg-primary" style="width: 60%">60%</div>
+                        {% elif order.status == 'shipped' %}
+                            <div class="progress-bar bg-info" style="width: 80%">80%</div>
+                        {% elif order.status == 'delivered' %}
+                            <div class="progress-bar bg-success" style="width: 100%">100%</div>
+                        {% else %}
+                            <div class="progress-bar bg-secondary" style="width: 100%">100%</div>
+                        {% endif %}
+                    </div>
+
+                    <p class="text-center mb-0">
+                        <strong>Current Status:</strong> 
+                        <span class="badge bg-{{ order.get_status_display_class }}">
+                            {{ order.get_status_display }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Delivery Info -->
+            <div class="card shadow-sm border-0 mt-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Delivery Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><strong>Customer:</strong></h6>
+                            <p>{{ order.name }}</p>
+
+                            <h6><strong>Phone:</strong></h6>
+                            <p>{{ order.phone }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><strong>Delivery Address:</strong></h6>
+                            <p>{{ order.address }}, {{ order.city }}, {{ order.state }} - {{ order.pincode }}</p>
+
+                            <h6><strong>Payment Method:</strong></h6>
+                            <p>{{ order.get_payment_method_display }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Section -->
+            <div class="text-center mt-5">
+                <div class="alert alert-info">
+                    <h5><i class="fas fa-headset me-2"></i>Need Help?</h5>
+                    <p class="mb-2">For any queries regarding your order delivery, contact our support team:</p>
+                    <p class="mb-1"><strong>Phone:</strong> 1800-123-4567</p>
+                    <p class="mb-0"><strong>Email:</strong> support@gulshop.com</p>
+                </div>
+
+                <a href="{% url 'products:home' %}" class="btn btn-warning">
+                    <i class="fas fa-home me-2"></i>Continue Shopping
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .step-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+        font-size: 1.2rem;
+        margin: 0 auto;
+    }
+    
+    .step-circle.active {
+        background: #ffc107;
+        color: white;
+        box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+    }
+    
+    .progress-bar {
+        transition: width 0.5s ease;
+    }
+</style>
+{% endblock %}

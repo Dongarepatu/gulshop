@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-4 mb-4">Premium Jaggery Products</h1>
+        <p class="lead mb-4">Experience the natural sweetness and health benefits of our authentic gul products</p>
+        <a href="#products" class="btn btn-warning btn-lg">Shop Now</a>
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-4">Our Categories</h2>
+        <div class="row text-center">
+            {% for category in categories %}
+            <div class="col-md-3 mb-3">
+                <a href="{% url 'products:product_list_by_category' category.slug %}"
+                    class="btn btn-outline-warning btn-lg category-badge">
+                    {{ category.name }}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section id="products" class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Our Premium Jaggery Products</h2>
+        <div class="row">
+            {% for product in products %}
+            <div class="col-lg-2 col-md-2 mb-4">
+                <div class="card product-card h-100">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
+                        >
+                    {% else %}
+                    <img src="/static/images/placeholder-product.jpg" class="card-img-top" alt="{{ product.name }}"
+                        >
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <!--<p class="card-text">{{ product.description|truncatewords:20 }}</p>-->
+                        <p class="h5 text-warning">₹{{ product.price }}</p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="{% url 'products:product_detail' product.id product.slug %}"
+                            class="btn btn-warning w-100">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p class="lead">No products available at the moment.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %} this is product_list

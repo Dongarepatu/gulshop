@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}  
+
+{% block content %}
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="row align-items-center mb-5">
+        <div class="col-lg-6">
+            <h1 class="display-4 text-warning">About Gul Shop</h1>
+            <p class="lead">Your Trusted Partner for Premium Quality Jaggery</p>
+            <p>For generations, we have been dedicated to bringing you the finest, naturally sweet jaggery products straight from traditional farms to your home.</p>
+        </div>
+        <div class="col-lg-6">
+            <img src="/static/images/about-hero.jpg" alt="About Gul Shop" class="img-fluid rounded shadow">
+        </div>
+    </div>
+
+    <!-- Our Story -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">Our Story</h2>
+                    <p class="text-center lead">Founded with a passion for natural sweetness and traditional methods, Gul Shop has been serving health-conscious families across India.</p>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="bg-warning text-white rounded-circle p-4 d-inline-block">
+                                <i class="fas fa-seedling fa-2x"></i>
+                            </div>
+                            <h4 class="mt-3">100% Natural</h4>
+                            <p>Pure, unadulterated jaggery from organic farms</p>
+                        </div>
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="bg-warning text-white rounded-circle p-4 d-inline-block">
+                                <i class="fas fa-heart fa-2x"></i>
+                            </div>
+                            <h4 class="mt-3">Health First</h4>
+                            <p>Rich in minerals and better than refined sugar</p>
+                        </div>
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="bg-warning text-white rounded-circle p-4 d-inline-block">
+                                <i class="fas fa-truck fa-2x"></i>
+                            </div>
+                            <h4 class="mt-3">Free Delivery</h4>
+                            <p>Free shipping on orders above ₹500</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Why Choose Us -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100 shadow">
+                <div class="card-body">
+                    <h3><i class="fas fa-award text-warning"></i> Why Choose Us?</h3>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check text-success"></i> Premium quality jaggery</li>
+                        <li class="mb-2"><i class="fas fa-check text-success"></i> Direct from farmers</li>
+                        <li class="mb-2"><i class="fas fa-check text-success"></i> No chemicals or preservatives</li>
+                        <li class="mb-2"><i class="fas fa-check text-success"></i> Traditional preparation methods</li>
+                        <li class="mb-2"><i class="fas fa-check text-success"></i> Competitive pricing</li>
+                        <li class="mb-2"><i class="fas fa-check text-success"></i> Fast delivery</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100 shadow">
+                <div class="card-body">
+                    <h3><i class="fas fa-history text-warning"></i> Our Process</h3>
+                    <div class="process-step">
+                        <h5>1. Selection</h5>
+                        <p>Careful selection of sugarcane from organic farms</p>
+                    </div>
+                    <div class="process-step">
+                        <h5>2. Extraction</h5>
+                        <p>Traditional juice extraction methods</p>
+                    </div>
+                    <div class="process-step">
+                        <h5>3. Purification</h5>
+                        <p>Natural purification without chemicals</p>
+                    </div>
+                    <div class="process-step">
+                        <h5>4. Packaging</h5>
+                        <p>Hygienic packaging for freshness</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.process-step {
+    border-left: 3px solid #8B4513;
+    padding-left: 15px;
+    margin-bottom: 20px;
+}
+.process-step h5 {
+    color: #8B4513;
+    margin-bottom: 5px;
+}
+</style>
+{% endblock %}
